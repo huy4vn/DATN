@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -30,10 +31,29 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <LangVersion>7.2</LangVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.dll</HintPath>
+    </Reference>
+    <Reference Include="EntityFramework.SqlServer, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
+      <HintPath>..\packages\EntityFramework.6.2.0\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=11.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="RBush, Version=2.0.31.0, Culture=neutral, PublicKeyToken=b1d5b814a0c60675, processorArchitecture=MSIL">
+      <HintPath>..\packages\RBush.2.0.31\lib\netstandard1.2\RBush.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Collections.Immutable.1.3.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -45,6 +65,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\BBRController.cs" />
+    <Compile Include="Controller\INTOPKController.cs" />
+    <Compile Include="Controller\SaveDataController.cs" />
+    <Compile Include="Controller\TreeHelper.cs" />
+    <Compile Include="DATNDataSet.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DATNDataSet.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="DATNDataSet1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DATNDataSet1.xsd</DependentUpon>
+    </Compile>
     <Compile Include="Form\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -52,7 +86,51 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="MainProcess.cs" />
+    <Compile Include="Model\DataPoint.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataPoint.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\DataPoint.cs">
+      <DependentUpon>DataPoint.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\DataPoint.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataPoint.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Model\DataPoint1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>DataPoint.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\MBRModel.cs" />
+    <Compile Include="Model\Node.cs" />
+    <Compile Include="Model\Point.cs" />
+    <Compile Include="Model\Rectangle.cs" />
+    <Compile Include="Model\RTree.cs" />
+    <Compile Include="Model\WeightVector.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WeightVector.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\WeightVector.cs">
+      <DependentUpon>WeightVector.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Model\WeightVector.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WeightVector.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Model\WeightVector1.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>WeightVector.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="Form\Form1.resx">
+      <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -62,6 +140,43 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <EntityDeploy Include="Model\WeightVector.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>WeightVector.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="DATNDataSet.xsc">
+      <DependentUpon>DATNDataSet.xsd</DependentUpon>
+    </None>
+    <None Include="DATNDataSet.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DATNDataSet.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DATNDataSet.xss">
+      <DependentUpon>DATNDataSet.xsd</DependentUpon>
+    </None>
+    <EntityDeploy Include="Model\DataPoint.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>DataPoint.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="DATNDataSet1.xsc">
+      <DependentUpon>DATNDataSet1.xsd</DependentUpon>
+    </None>
+    <None Include="DATNDataSet1.xsd">
+      <Generator>MSDataSetGenerator</Generator>
+      <LastGenOutput>DATNDataSet1.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="DATNDataSet1.xss">
+      <DependentUpon>DATNDataSet1.xsd</DependentUpon>
+    </None>
+    <None Include="Model\DataPoint.edmx.diagram">
+      <DependentUpon>DataPoint.edmx</DependentUpon>
+    </None>
+    <None Include="Model\WeightVector.edmx.diagram">
+      <DependentUpon>WeightVector.edmx</DependentUpon>
+    </None>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -73,11 +188,35 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Controller\" />
-    <Folder Include="Model\" />
+    <Content Include="Model\DataPoint.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DataPoint.edmx</DependentUpon>
+      <LastGenOutput>DataPoint.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Model\DataPoint.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>DataPoint.edmx</DependentUpon>
+      <LastGenOutput>DataPoint1.cs</LastGenOutput>
+    </Content>
+    <Content Include="Model\WeightVector.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WeightVector.edmx</DependentUpon>
+      <LastGenOutput>WeightVector.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Model\WeightVector.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>WeightVector.edmx</DependentUpon>
+      <LastGenOutput>WeightVector1.cs</LastGenOutput>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
