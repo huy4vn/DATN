@@ -2,6 +2,7 @@
 using RTree;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,8 +33,9 @@ namespace DATN.Controller
                     RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
                     tree.Add(rect, p);
                 }
+                SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
             }
-            SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
+            
             this.tree = tree;
             treeHelper = new TreeHelper(tree);
         }
@@ -167,8 +169,11 @@ namespace DATN.Controller
                 //double uscore = uv(mv, q);
                 //if (test < uscore)
                 //{
-                    C = expand(entries);
+                
+                C = expand(entries);
+               
                 //}
+              
                 foreach (MBRModel<DataPoint> ei in C)
                 {
                     if (uv(mv, q) > lv(mv, ei.lowerLeft))
@@ -192,8 +197,9 @@ namespace DATN.Controller
                     }
                   
                 }
-
+               
             }
+            
             if (precincPoints >= k)
             {
                 return 0;

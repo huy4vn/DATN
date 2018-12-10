@@ -734,6 +734,7 @@ namespace RTree
             if (highestLowIndex == -1)
             {
                 newNode.addEntry(newRect, newId);
+                return;
             }
             else
             {
@@ -750,7 +751,10 @@ namespace RTree
             {
                 lowestHighIndex = highestLowIndex;
             }
-
+            //if (highestLowIndex == -1)
+            //{
+            //    highestLowIndex = lowestHighIndex;
+            //}
             entryStatus[lowestHighIndex] = ENTRY_STATUS_ASSIGNED;
             n.entryCount = n.entries.Length;
             n.recalculateMBR(n.entries[highestLowIndex]);

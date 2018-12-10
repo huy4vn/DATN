@@ -28,27 +28,30 @@ namespace DATN
             this.dataPointTableAdapter.Fill(this.dATNDataSet1.DataPoint);
             // TODO: This line of code loads data into the 'dATNDataSet.WeightVector' table. You can move, or remove it, as needed.
             this.weightVectorTableAdapter.Fill(this.dATNDataSet.WeightVector);
-
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             try
             {
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
-                List<WeightVector> result=controller.BBR(point,Int32.Parse(this.rank.Text));
+                HashSet<WeightVector> result=controller.BBR(point,Int32.Parse(this.rank.Text));
+                watch.Stop();
+                var elapsedMs = watch.ElapsedMilliseconds;
                 if (result.Count == 0)
                 {
-                    MessageBox.Show("None of the weighting vectors of mV belongs to the reverse top-2 result set of q");
+                    MessageBox.Show("None of the weighting vectors of mV belongs to the reverse top-2 result set of q. Excute Time : "+elapsedMs);
                 }
                 else
                 {
-                    MessageBox.Show("Got something");
+                    MessageBox.Show("Got something. Excute Time : " + elapsedMs);
                 }
-            }
-            catch (Exception)
-            {
                 
+            }
+            catch (Exception err)
+            {
+                MessageBox.Show(err.Message);
             }
         }
     }
