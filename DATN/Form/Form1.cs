@@ -29,7 +29,19 @@ namespace DATN
             // TODO: This line of code loads data into the 'dATNDataSet.WeightVector' table. You can move, or remove it, as needed.
             this.weightVectorTableAdapter.Fill(this.dATNDataSet.WeightVector);
         }
+        private void fillTable(HashSet<WeightVector> result)
+        {
+            DataTable table = new DataTable();
+            table.Columns.Add("id", typeof(int));
+            table.Columns.Add("rating", typeof(float));
+            table.Columns.Add("star", typeof(float));
 
+            foreach(var item in result)
+            {
+                table.Rows.Add(item.id, item.rating, item.star);
+            }
+            this.dataGridView2.DataSource = table;
+        }
         private void button1_Click(object sender, EventArgs e)
         {
             try
@@ -46,6 +58,7 @@ namespace DATN
                 else
                 {
                     MessageBox.Show("Got something. Excute Time : " + elapsedMs);
+                    fillTable(result);
                 }
                 
             }
