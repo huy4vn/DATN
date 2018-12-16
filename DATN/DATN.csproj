@@ -54,6 +54,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -67,7 +68,9 @@
   <ItemGroup>
     <Compile Include="Controller\BBRController.cs" />
     <Compile Include="Controller\INTOPKController.cs" />
+    <Compile Include="Controller\RTAController.cs" />
     <Compile Include="Controller\SaveDataController.cs" />
+    <Compile Include="Controller\TopKController.cs" />
     <Compile Include="Controller\TreeHelper.cs" />
     <Compile Include="DATNDataSet.Designer.cs">
       <AutoGen>True</AutoGen>

@@ -17,6 +17,7 @@ namespace DATN
     {
         BBRController controller = new BBRController();
         INTOPKController intopkController = new INTOPKController();
+        RTAController rtaController = new RTAController();
         public Form1()
         {
             InitializeComponent();
@@ -48,24 +49,52 @@ namespace DATN
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
                 DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
-                HashSet<WeightVector> result=controller.BBR(point,Int32.Parse(this.rank.Text));
+                KeyValuePair<int, HashSet<WeightVector>> result =controller.BBR(point,Int32.Parse(this.rank.Text));
                 watch.Stop();
+                fillTable(result.Value);
                 var elapsedMs = watch.ElapsedMilliseconds;
-                if (result.Count == 0)
-                {
-                    MessageBox.Show("None of the weighting vectors of mV belongs to the reverse top-2 result set of q. Excute Time : "+elapsedMs);
-                }
-                else
-                {
-                    MessageBox.Show("Got something. Excute Time : " + elapsedMs);
-                    fillTable(result);
-                }
-                
+                chart1.Series[0].Points.AddY(elapsedMs);
+                chart2.Series[0].Points.AddY(result.Key);
+                MessageBox.Show("Done");
+
             }
             catch (Exception err)
             {
                 MessageBox.Show(err.Message);
             }
         }
+        public List<WeightVector> GetW(WeightVectorEntities entities)
+        {
+            var query = from p in entities.WeightVectors
+                        select p;
+            return query.ToList();
+        }
+        public List<DataPoint> GetS(DATNEntities entities)
+        {
+            var query = from p in entities.DataPoints
+                        select p;
+
+            return query.ToList();
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            var watch = System.Diagnostics.Stopwatch.StartNew();
+            DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
+            WeightVectorEntities entities = new WeightVectorEntities();
+            DATNEntities entities2 = new DATNEntities();
+            List<DataPoint> listS = GetS(entities2);
+            List<WeightVector> listW = GetW(entities);
+            entities.Dispose();
+            entities2.Dispose();
+            KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS,listW,point, Int32.Parse(this.rank.Text));
+            watch.Stop();
+            fillTable(result.Value);
+            var elapsedMs = watch.ElapsedMilliseconds;
+            chart1.Series[1].Points.AddY(elapsedMs);
+            chart2.Series[1].Points.AddY(result.Key);
+            MessageBox.Show("Done");
+        }
+
+
     }
 }

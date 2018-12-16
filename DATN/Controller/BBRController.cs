@@ -38,9 +38,11 @@ namespace DATN.Controller
                             select p;
                 List<WeightVector> listItem = query.ToList();
                 tree = new RTree.RTree<WeightVector>(listItem.Count / 2, 2);
+                int count = 0;
                 foreach (WeightVector p in listItem)
                 {
-                   
+                    count++;
+                    Debug.WriteLine(count);
                     RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
                     tree.Add(rect, p);
                 }
@@ -161,10 +163,11 @@ namespace DATN.Controller
         {
             return point.lowerLeft.rating == point.upperRight.rating && point.lowerLeft.star == point.upperRight.star;
         }
-        public HashSet<WeightVector> BBR(DataPoint data,int rank)
+        public KeyValuePair<int, HashSet<WeightVector>> BBR(DataPoint data,int rank)
         {
 
             MBRModel<WeightVector> mbr = getRoot();
+            MBRModel<DataPoint> entries = intopkController.getRoot();
             Queue<MBRModel<WeightVector>> heapW = new Queue<MBRModel<WeightVector>>();
             HashSet<WeightVector> result = new HashSet<WeightVector>();
             heapW.Enqueue(mbr);
@@ -174,7 +177,7 @@ namespace DATN.Controller
                 MBRModel<WeightVector> e = heapW.Dequeue();
                 //TODO wating for Q to implement INTOPK, right now will create random result
                 
-                i = intopkController.IntopK(e, data,rank);
+                i = intopkController.IntopK(entries,e, data,rank);
                 count++;
                 
                 if (i == 0)
@@ -197,7 +200,7 @@ namespace DATN.Controller
                     }
                 }
             }
-            return result;
+            return new KeyValuePair<int, HashSet<WeightVector>>(count,result);
         }
     }
 }

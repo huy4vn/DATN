@@ -142,14 +142,12 @@ namespace RTree
             // per node, but will be inefficient.
             if (maxNodeEntries < 2)
             {
-                Debug.WriteLine($"Invalid MaxNodeEntries = {maxNodeEntries} Resetting to default value of {DEFAULT_MAX_NODE_ENTRIES}");
-                maxNodeEntries = DEFAULT_MAX_NODE_ENTRIES;
+               maxNodeEntries = DEFAULT_MAX_NODE_ENTRIES;
             }
 
             // The MinNodeEntries must be less than or equal to (int) (MaxNodeEntries / 2)
             if (minNodeEntries < 1 || minNodeEntries > maxNodeEntries / 2)
             {
-                Debug.WriteLine("MinNodeEntries must be between 1 and MaxNodeEntries / 2");
                 minNodeEntries = maxNodeEntries / 2;
             }
 
@@ -164,7 +162,6 @@ namespace RTree
             Node<T> root = new Node<T>(rootNodeId, 1, maxNodeEntries);
             nodeMap.Add(rootNodeId, root);
 
-            Debug.WriteLine($"init()  MaxNodeEntries = {maxNodeEntries}, MinNodeEntries = {minNodeEntries}");
             locker.ReleaseWriterLock();
         }
 
@@ -188,8 +185,7 @@ namespace RTree
 
         public void add(Rectangle r, int id)
         {
-            Debug.WriteLine($"Adding rectangle {r}, id {id}");
-
+           
             add(r.copy(), id, 1);
 
             msize++;
@@ -294,7 +290,6 @@ namespace RTree
 
                 if (!n.isLeaf())
                 {
-                    Debug.WriteLine($"searching Node<T> {n.nodeId}, from index {startIndex}");
                     bool contains = false;
                     for (int i = startIndex; i < n.entryCount; i++)
                     {
@@ -636,22 +631,12 @@ namespace RTree
             // check that the MBR stored for each Node&lt;T&gt; is correct.
             if (INTERNAL_CONSISTENCY_CHECKING)
             {
-                if (!n.mbr.Equals(calculateMBR(n)))
-                {
-                    Debug.WriteLine("Error: splitNode old Node<T> MBR wrong");
-                }
-
-                if (!newNode.mbr.Equals(calculateMBR(newNode)))
-                {
-                    Debug.WriteLine("Error: splitNode new Node<T> MBR wrong");
-                }
             }
 
             // debug code
 #if DEBUG
             float newArea = n.mbr.area() + newNode.mbr.area();
             float percentageIncrease = (100 * (newArea - initialArea)) / initialArea;
-            Debug.WriteLine($"Node { n.nodeId} split. New area increased by {percentageIncrease}%");
 #endif
 
             return newNode;
@@ -677,8 +662,7 @@ namespace RTree
             // for the purposes of picking seeds, take the MBR of the Node&lt;T&gt; to include
             // the new rectangle aswell.
             n.mbr.add(newRect);
-
-            Debug.WriteLine($"pickSeeds(): NodeId = {n.nodeId}, newRect = {newRect}");
+            
 
             for (int d = 0; d < Rectangle.DIMENSIONS; d++)
             {
@@ -711,14 +695,9 @@ namespace RTree
                     // dimension
                     float normalizedSeparation = (tempHighestLow - tempLowestHigh) / (n.mbr.max[d] - n.mbr.min[d]);
 
-                    if (normalizedSeparation > 1 || normalizedSeparation < -1)
-                    {
-                        Debug.WriteLine("Invalid normalized separation");
-                    }
+                    
 
-                    Debug.WriteLine($"Entry {i}, dimension {d}: HighestLow = {tempHighestLow} (index {tempHighestLowIndex})" + ", LowestHigh = " +
-                              tempLowestHigh + $" (index {tempLowestHighIndex}, NormalizedSeparation = {normalizedSeparation}");
-
+                   
                     // PS3 [Select the most extreme pair] Choose the pair with the greatest
                     // normalized separation along any dimension.
                     if (normalizedSeparation > maxNormalizedSeparation)
@@ -779,18 +758,14 @@ namespace RTree
             int nextGroup = 0;
 
             maxDifference = float.NegativeInfinity;
-
-            Debug.WriteLine("pickNext()");
+            
 
             for (int i = 0; i < maxNodeEntries; i++)
             {
                 if (entryStatus[i] == ENTRY_STATUS_UNASSIGNED)
                 {
 
-                    if (n.entries[i] == null)
-                    {
-                        Debug.WriteLine($"Error: Node<T> {n.nodeId}, entry {i} is null");
-                    }
+                  
 
                     float nIncrease = n.mbr.enlargement(n.entries[i]);
                     float newNodeIncrease = newNode.mbr.enlargement(n.entries[i]);
@@ -827,8 +802,6 @@ namespace RTree
                         maxDifference = difference;
                     }
 
-                    Debug.WriteLine($"Entry {i} group0 increase = {nIncrease}, group1 increase = {newNodeIncrease}, diff = " + 
-                        difference + $", MaxDiff = {maxDifference} (entry {next})");
                 }
             }
 
@@ -1005,10 +978,7 @@ namespace RTree
             // CL2 [Leaf check] If N is a leaf, return N
             while (true)
             {
-                if (n == null)
-                {
-                    Debug.WriteLine($"Could not get root Node<T> ({rootNodeId})");
-                }
+             
 
                 if (n.level == level)
                 {
@@ -1061,10 +1031,7 @@ namespace RTree
                 Node<T> parent = getNode(parents.Pop());
                 int entry = parentsEntry.Pop();
 
-                if (parent.ids[entry] != n.nodeId)
-                {
-                    Debug.WriteLine($"Error: entry {entry} in Node<T> {parent.nodeId} should point to Node<T> {n.nodeId}; actually points to Node<T> {parent.ids[entry]}");
-                }
+
 
                 if (!parent.entries[entry].Equals(n.mbr))
                 {
@@ -1115,40 +1082,19 @@ namespace RTree
             // the tree are not corrupted.    
             Node<T> n = getNode(nodeId);
 
-            if (n == null)
-            {
-                Debug.WriteLine($"Error: Could not read Node<T> {nodeId}");
-            }
-
-            if (n.level != expectedLevel)
-            {
-                Debug.WriteLine($"Error: Node<T> {nodeId}, expected level {expectedLevel}, actual level {n.level}");
-            }
+          
 
             Rectangle calculatedMBR = calculateMBR(n);
 
-            if (!n.mbr.Equals(calculatedMBR))
-            {
-                Debug.WriteLine($"Error: Node<T> {nodeId}, calculated MBR does not equal stored MBR");
-            }
+          
 
-            if (expectedMBR != null && !n.mbr.Equals(expectedMBR))
-            {
-                Debug.WriteLine($"Error: Node<T> {nodeId}, expected MBR (from parent) does not equal stored MBR");
-            }
+          
 
-            // Check for corruption where a parent entry is the same object as the child MBR
-            if (expectedMBR != null && n.mbr.sameObject(expectedMBR))
-            {
-                Debug.WriteLine($"Error: Node<T> {nodeId} MBR using same rectangle object as parent's entry");
-            }
+           
 
             for (int i = 0; i < n.entryCount; i++)
             {
-                if (n.entries[i] == null)
-                {
-                    Debug.WriteLine($"Error: Node<T> {nodeId}, Entry {i} is null");
-                }
+              
 
                 if (n.level > 1)
                 { // if not a leaf

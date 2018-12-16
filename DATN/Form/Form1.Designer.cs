@@ -29,6 +29,15 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.starDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ratingDataGridViewTextBoxColumn = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -52,6 +61,12 @@
             this.dataGridViewTextBoxColumn3 = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.dataGridView2 = new System.Windows.Forms.DataGridView();
             this.weightVectorBindingSource1 = new System.Windows.Forms.BindingSource(this.components);
+            this.button2 = new System.Windows.Forms.Button();
+            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.label5 = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.weightVectorBindingSource)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dATNDataSet)).BeginInit();
@@ -60,6 +75,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataPointDataGridView)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.weightVectorBindingSource1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             this.SuspendLayout();
             // 
             // dataGridView1
@@ -71,7 +88,7 @@
             this.ratingDataGridViewTextBoxColumn});
             this.dataGridView1.DataSource = this.weightVectorBindingSource;
             this.dataGridView1.Location = new System.Drawing.Point(9, 24);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.Size = new System.Drawing.Size(214, 269);
@@ -105,19 +122,19 @@
             // 
             // button1
             // 
-            this.button1.Location = new System.Drawing.Point(506, 238);
-            this.button1.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.button1.Location = new System.Drawing.Point(500, 154);
+            this.button1.Margin = new System.Windows.Forms.Padding(2);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(124, 58);
             this.button1.TabIndex = 1;
-            this.button1.Text = "Process";
+            this.button1.Text = "BBR Process";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // rating
             // 
             this.rating.Location = new System.Drawing.Point(546, 41);
-            this.rating.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rating.Margin = new System.Windows.Forms.Padding(2);
             this.rating.Name = "rating";
             this.rating.Size = new System.Drawing.Size(76, 20);
             this.rating.TabIndex = 2;
@@ -125,7 +142,7 @@
             // star
             // 
             this.star.Location = new System.Drawing.Point(546, 76);
-            this.star.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.star.Margin = new System.Windows.Forms.Padding(2);
             this.star.Name = "star";
             this.star.Size = new System.Drawing.Size(76, 20);
             this.star.TabIndex = 3;
@@ -177,7 +194,7 @@
             // rank
             // 
             this.rank.Location = new System.Drawing.Point(546, 114);
-            this.rank.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.rank.Margin = new System.Windows.Forms.Padding(2);
             this.rank.Name = "rank";
             this.rank.Size = new System.Drawing.Size(76, 20);
             this.rank.TabIndex = 8;
@@ -211,7 +228,7 @@
             this.dataGridViewTextBoxColumn3});
             this.dataPointDataGridView.DataSource = this.dataPointBindingSource;
             this.dataPointDataGridView.Location = new System.Drawing.Point(233, 24);
-            this.dataPointDataGridView.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.dataPointDataGridView.Margin = new System.Windows.Forms.Padding(2);
             this.dataPointDataGridView.Name = "dataPointDataGridView";
             this.dataPointDataGridView.RowTemplate.Height = 24;
             this.dataPointDataGridView.Size = new System.Drawing.Size(218, 271);
@@ -242,11 +259,103 @@
             this.weightVectorBindingSource1.DataMember = "WeightVector";
             this.weightVectorBindingSource1.DataSource = this.dATNDataSet;
             // 
+            // button2
+            // 
+            this.button2.Location = new System.Drawing.Point(500, 235);
+            this.button2.Margin = new System.Windows.Forms.Padding(2);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(124, 58);
+            this.button2.TabIndex = 11;
+            this.button2.Text = "RTA Process";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new System.EventHandler(this.button2_Click);
+            // 
+            // chart1
+            // 
+            chartArea1.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea1);
+            legend1.Name = "Legend1";
+            this.chart1.Legends.Add(legend1);
+            this.chart1.Location = new System.Drawing.Point(30, 340);
+            this.chart1.Name = "chart1";
+            series1.ChartArea = "ChartArea1";
+            series1.Legend = "Legend1";
+            series1.Name = "BBR";
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "RTA";
+            this.chart1.Series.Add(series1);
+            this.chart1.Series.Add(series2);
+            this.chart1.Size = new System.Drawing.Size(1007, 194);
+            this.chart1.TabIndex = 12;
+            this.chart1.Text = "Process Time";
+            title1.Name = "Processing Time";
+            this.chart1.Titles.Add(title1);
+            // 
+            // chart2
+            // 
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart2.Legends.Add(legend2);
+            this.chart2.Location = new System.Drawing.Point(30, 591);
+            this.chart2.Name = "chart2";
+            series3.ChartArea = "ChartArea1";
+            series3.Legend = "Legend1";
+            series3.Name = "BBR";
+            series4.ChartArea = "ChartArea1";
+            series4.Legend = "Legend1";
+            series4.Name = "RTA";
+            this.chart2.Series.Add(series3);
+            this.chart2.Series.Add(series4);
+            this.chart2.Size = new System.Drawing.Size(1007, 192);
+            this.chart2.TabIndex = 13;
+            this.chart2.Text = "Access Data Time";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label5.Location = new System.Drawing.Point(493, 316);
+            this.label5.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(102, 18);
+            this.label5.TabIndex = 14;
+            this.label5.Text = "Chart Result";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(493, 553);
+            this.label6.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(113, 18);
+            this.label6.TabIndex = 15;
+            this.label6.Text = "Process Time";
+            // 
+            // label7
+            // 
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(493, 800);
+            this.label7.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(145, 18);
+            this.label7.TabIndex = 16;
+            this.label7.Text = "Data Access Time";
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1094, 338);
+            this.ClientSize = new System.Drawing.Size(1071, 881);
+            this.Controls.Add(this.label7);
+            this.Controls.Add(this.label6);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.chart2);
+            this.Controls.Add(this.chart1);
+            this.Controls.Add(this.button2);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.dataPointDataGridView);
             this.Controls.Add(this.rank);
@@ -258,9 +367,9 @@
             this.Controls.Add(this.rating);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.dataGridView1);
-            this.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.Margin = new System.Windows.Forms.Padding(2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = " ";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.weightVectorBindingSource)).EndInit();
@@ -270,6 +379,8 @@
             ((System.ComponentModel.ISupportInitialize)(this.dataPointDataGridView)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.weightVectorBindingSource1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -300,6 +411,12 @@
         private System.Windows.Forms.DataGridViewTextBoxColumn dataGridViewTextBoxColumn3;
         private System.Windows.Forms.DataGridView dataGridView2;
         private System.Windows.Forms.BindingSource weightVectorBindingSource1;
+        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label label7;
     }
 }
 

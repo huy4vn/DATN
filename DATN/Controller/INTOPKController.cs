@@ -28,8 +28,11 @@ namespace DATN.Controller
                             select p;
                 List<DataPoint> listItem = query.ToList();
                 tree = new RTree.RTree<DataPoint>(listItem.Count/2,2);
+                int count = 0;
                 foreach (DataPoint p in listItem)
                 {
+
+                    Debug.WriteLine("INTOP - "+count);
                     RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
                     tree.Add(rect, p);
                 }
@@ -130,11 +133,12 @@ namespace DATN.Controller
             }
             
         }
-        public int IntopK(MBRModel<WeightVector> mv, DataPoint q, int k)
+        public int IntopK(MBRModel<DataPoint> entries,MBRModel<WeightVector> mv, DataPoint q, int k)
         {
             //init value
+            
             int precincPoints = 0, precEntries = 0;
-            MBRModel<DataPoint> entries = getRoot();
+            
             List<MBRModel<DataPoint>> C = new List<MBRModel<DataPoint>>();
             Queue<MBRModel<DataPoint>> HeapS = new Queue<MBRModel<DataPoint>>();
              if (uv(mv, q) > lv(mv, entries.lowerLeft))
@@ -169,9 +173,8 @@ namespace DATN.Controller
                 //double uscore = uv(mv, q);
                 //if (test < uscore)
                 //{
-                
+
                 C = expand(entries);
-               
                 //}
               
                 foreach (MBRModel<DataPoint> ei in C)
