@@ -13,7 +13,11 @@ namespace DATN.Controller
     class BBRController
     {
 
-        INTOPKController intopkController = new INTOPKController();
+        INTOPKController intopkController;
+        public void setIntopController(INTOPKController iNTOPKController)
+        {
+            this.intopkController = iNTOPKController;
+        }
         RTree.RTree<WeightVector> tree;
         String fileName = "WeightVector.data";
         public bool contains(WeightVector e, MBRModel<WeightVector> MBR)
@@ -27,33 +31,37 @@ namespace DATN.Controller
         public void getTree()
         {
             System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\"));
-            RTree.RTree<WeightVector> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<WeightVector>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
-            //not created before
-            tree.locker = new System.Threading.ReaderWriterLock();
-            if (tree.Count == 0)
+            if (tree == null)
             {
-                //query database
-                WeightVectorEntities entities = new WeightVectorEntities();
-                var query = from p in entities.WeightVectors
-                            select p;
-                List<WeightVector> listItem = query.ToList();
-                tree = new RTree.RTree<WeightVector>(listItem.Count / 2, 2);
-                int count = 0;
-                foreach (WeightVector p in listItem)
+                RTree.RTree<WeightVector> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<WeightVector>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
+                //not created before
+                tree.locker = new System.Threading.ReaderWriterLock();
+                if (tree.Count == 0)
                 {
-                    count++;
-                    Debug.WriteLine(count);
-                    RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
-                    tree.Add(rect, p);
-                }
+                    //query database
+                    WeightVectorEntities entities = new WeightVectorEntities();
+                    var query = from p in entities.WeightVectors
+                                select p;
+                    List<WeightVector> listItem = query.ToList();
+                    tree = new RTree.RTree<WeightVector>(listItem.Count>9? 9:listItem.Count/2, 2);
+                    int count = 0;
+                    foreach (WeightVector p in listItem)
+                    {
+                        count++;
+                        Debug.WriteLine(count);
+                        RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
+                        tree.Add(rect, p);
+                    }
 
-                SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
+                    SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
+                }
+                this.tree = tree;
+
             }
-            this.tree = tree;
         }
-        public MBRModel<WeightVector> getRoot()
+            public MBRModel<WeightVector> getRoot()
         {
-            getTree();
+            //getTree();
             //get root after add to tree 
             RTree.Rectangle bounds = tree.getBounds();
             WeightVector upperRight = new WeightVector(bounds.get(0).GetValueOrDefault().max, bounds.get(1).GetValueOrDefault().max);
@@ -61,11 +69,13 @@ namespace DATN.Controller
             //retrun root
             return new MBRModel<WeightVector>(lowerLeft, upperRight);
         }
-        private List<MBRModel<WeightVector>> expand(MBRModel<WeightVector> e)
+        private HashSet<MBRModel<WeightVector>> expand(MBRModel<WeightVector> e)
         {
-            List<MBRModel<WeightVector>> result = new List<MBRModel<WeightVector>>();
-
-            result.AddRange(getChildBoundsAndPoints(e));
+            HashSet<MBRModel<WeightVector>> result = new HashSet<MBRModel<WeightVector>>();
+            foreach(var item in getChildBoundsAndPoints(e))
+            {
+                result.Add(item);
+            }
             return result;
         }
         private List<WeightVector> expandAll(MBRModel<WeightVector> e)
@@ -79,7 +89,7 @@ namespace DATN.Controller
       
             Dictionary<int, Node<WeightVector>> node;
             Dictionary<int, Node<WeightVector>> treeNode= tree.nodeMap;
-            //List<WeightVector> node = tree.Contains(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star,0,0));
+            //List<WeightVector> node = tree.Contains(new Rectangle(e.lowerLeft.rating, e.lowerLeft.star, e.upperRight.rating, e.upperRight.star,0,0));
 
             //entries is root
             if (tree.getBounds().Equals(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0)))
@@ -172,16 +182,17 @@ namespace DATN.Controller
             HashSet<WeightVector> result = new HashSet<WeightVector>();
             heapW.Enqueue(mbr);
             int i,count=0;
+
+            var watch = System.Diagnostics.Stopwatch.StartNew();
             while (heapW.Count > 0)
             {
                 MBRModel<WeightVector> e = heapW.Dequeue();
                 //TODO wating for Q to implement INTOPK, right now will create random result
-                
                 i = intopkController.IntopK(entries,e, data,rank);
                 count++;
-                
                 if (i == 0)
                 {
+                    
                     foreach(var item in expand(e))
                     {
                         heapW.Enqueue(item);
@@ -200,6 +211,7 @@ namespace DATN.Controller
                     }
                 }
             }
+
             return new KeyValuePair<int, HashSet<WeightVector>>(count,result);
         }
     }

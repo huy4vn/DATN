@@ -29,6 +29,10 @@ namespace DATN
             this.dataPointTableAdapter.Fill(this.dATNDataSet1.DataPoint);
             // TODO: This line of code loads data into the 'dATNDataSet.WeightVector' table. You can move, or remove it, as needed.
             this.weightVectorTableAdapter.Fill(this.dATNDataSet.WeightVector);
+
+            controller.getTree();
+            intopkController.getTree();
+            controller.setIntopController(intopkController);
         }
         private void fillTable(HashSet<WeightVector> result)
         {
@@ -65,7 +69,7 @@ namespace DATN
         }
         public List<WeightVector> GetW(WeightVectorEntities entities)
         {
-            var query = from p in entities.WeightVectors
+            var query = from p in entities.WeightVectors orderby p.rating,p.star ascending 
                         select p;
             return query.ToList();
         }

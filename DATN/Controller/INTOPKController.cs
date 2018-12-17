@@ -17,34 +17,37 @@ namespace DATN.Controller
         public void getTree()
         {
             System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\"));
-            RTree.RTree<DataPoint> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<DataPoint>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
-            //not created before
-            tree.locker = new System.Threading.ReaderWriterLock();
-            if (tree.Count==0)
+            if (tree == null)
             {
-                //query database
-                DATNEntities entities = new DATNEntities();
-                var query = from p in entities.DataPoints
-                            select p;
-                List<DataPoint> listItem = query.ToList();
-                tree = new RTree.RTree<DataPoint>(listItem.Count/2,2);
-                int count = 0;
-                foreach (DataPoint p in listItem)
+                RTree.RTree<DataPoint> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<DataPoint>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
+                //not created before
+                tree.locker = new System.Threading.ReaderWriterLock();
+                if (tree.Count == 0)
                 {
-
-                    Debug.WriteLine("INTOP - "+count);
-                    RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
-                    tree.Add(rect, p);
+                    //query database
+                    DATNEntities entities = new DATNEntities();
+                    var query = from p in entities.DataPoints
+                                select p;
+                    List<DataPoint> listItem = query.ToList();
+                    tree = new RTree.RTree<DataPoint>(listItem.Count > 9 ? 9 : listItem.Count / 2, 2);
+                    int count = 0;
+                    foreach (DataPoint p in listItem)
+                    {
+                        count++;
+                        Debug.WriteLine("INTOP - " + count);
+                        RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
+                        tree.Add(rect, p);
+                    }
+                    SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
                 }
-                SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
+
+                this.tree = tree;
+                treeHelper = new TreeHelper(tree);
             }
-            
-            this.tree = tree;
-            treeHelper = new TreeHelper(tree);
         }
         public MBRModel<DataPoint> getRoot()
         {
-            getTree();
+            //getTree();
             //get root after add to tree 
             RTree.Rectangle bounds = tree.getBounds();
             DataPoint upperRight = new DataPoint(bounds.get(0).GetValueOrDefault().max, bounds.get(1).GetValueOrDefault().max);
