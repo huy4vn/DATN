@@ -98,7 +98,5 @@ namespace DATN
             chart2.Series[1].Points.AddY(result.Key);
             MessageBox.Show("Done");
         }
-
-
     }
 }
