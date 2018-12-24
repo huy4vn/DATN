@@ -11,7 +11,7 @@ namespace DATN.Controller
     {
         public static double f(DataPoint q, WeightVector w)
         {
-            return q.star.Value * w.star.Value + q.rating.Value + w.rating.Value;
+            return q.star.Value * w.star.Value + q.rating.Value * w.rating.Value;
         }
 
         public static List<DataPoint> TopK(WeightVector w,List<DataPoint> points,int rank)

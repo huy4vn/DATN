@@ -12,6 +12,7 @@ namespace DATN.Controller
     class INTOPKController
     {
         RTree.RTree<DataPoint> tree;
+        public List<DataPoint> listItem = new List<DataPoint>();
         TreeHelper treeHelper;
         String fileName="DataPoint.data";
         public void getTree()
@@ -22,14 +23,9 @@ namespace DATN.Controller
                 RTree.RTree<DataPoint> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<DataPoint>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
                 //not created before
                 tree.locker = new System.Threading.ReaderWriterLock();
-                if (tree.Count == 0)
+                if (tree.Count == 0 || (tree.Count > 0 && tree.Count != listItem.Count))
                 {
-                    //query database
-                    DATNEntities entities = new DATNEntities();
-                    var query = from p in entities.DataPoints
-                                select p;
-                    List<DataPoint> listItem = query.ToList();
-                    tree = new RTree.RTree<DataPoint>(listItem.Count > 9 ? 9 : listItem.Count / 2, 2);
+                    tree = new RTree.RTree<DataPoint>(listItem.Count / 2, 2);
                     int count = 0;
                     foreach (DataPoint p in listItem)
                     {
@@ -152,6 +148,7 @@ namespace DATN.Controller
                     precEntries++;
                 }
             }
+             
             //while heap not empty
             while (HeapS.Count > 0)
             {
@@ -176,11 +173,9 @@ namespace DATN.Controller
                 //double uscore = uv(mv, q);
                 //if (test < uscore)
                 //{
-
                 C = expand(entries);
                 //}
-              
-                foreach (MBRModel<DataPoint> ei in C)
+                foreach (var ei in C)
                 {
                     if (uv(mv, q) > lv(mv, ei.lowerLeft))
                     {
@@ -201,7 +196,6 @@ namespace DATN.Controller
                             HeapS.Enqueue(ei);
                         }
                     }
-                  
                 }
                
             }
@@ -212,6 +206,7 @@ namespace DATN.Controller
             }
             else
             {
+                
                 return 1;
             }
         }

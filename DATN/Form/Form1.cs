@@ -18,6 +18,8 @@ namespace DATN
         BBRController controller = new BBRController();
         INTOPKController intopkController = new INTOPKController();
         RTAController rtaController = new RTAController();
+        List<DataPoint> listS;
+        List<WeightVector> listW;
         public Form1()
         {
             InitializeComponent();
@@ -30,7 +32,15 @@ namespace DATN
             // TODO: This line of code loads data into the 'dATNDataSet.WeightVector' table. You can move, or remove it, as needed.
             this.weightVectorTableAdapter.Fill(this.dATNDataSet.WeightVector);
 
+            WeightVectorEntities entities = new WeightVectorEntities();
+            DATNEntities entities2 = new DATNEntities();
+            listS=GetS(entities2);
+            listW = GetW(entities);
+            entities.Dispose();
+            entities2.Dispose();
+            controller.listItem = listW;
             controller.getTree();
+            intopkController.listItem = listS;
             intopkController.getTree();
             controller.setIntopController(intopkController);
         }
@@ -69,7 +79,7 @@ namespace DATN
         }
         public List<WeightVector> GetW(WeightVectorEntities entities)
         {
-            var query = from p in entities.WeightVectors orderby p.rating,p.star ascending 
+            var query = from p in entities.WeightVectors 
                         select p;
             return query.ToList();
         }
@@ -84,12 +94,7 @@ namespace DATN
         {
             var watch = System.Diagnostics.Stopwatch.StartNew();
             DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
-            WeightVectorEntities entities = new WeightVectorEntities();
-            DATNEntities entities2 = new DATNEntities();
-            List<DataPoint> listS = GetS(entities2);
-            List<WeightVector> listW = GetW(entities);
-            entities.Dispose();
-            entities2.Dispose();
+           
             KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS,listW,point, Int32.Parse(this.rank.Text));
             watch.Stop();
             fillTable(result.Value);

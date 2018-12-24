@@ -34,8 +34,7 @@ namespace DATN.Controller
             List<DataPoint> buffer = new List<DataPoint>(k);
             int totalAccessWeightVector=0;
             double threshold = Int32.MaxValue;
-            for (var i = 0; i < W.Count; i++)
-            {
+            for (var i = 0; i < W.Count; i++)         {
                 totalAccessWeightVector++;
                 if (f(q, W[i]) <= threshold)
                 {

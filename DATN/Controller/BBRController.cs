@@ -14,6 +14,7 @@ namespace DATN.Controller
     {
 
         INTOPKController intopkController;
+        public List<WeightVector> listItem = new List<WeightVector>();
         public void setIntopController(INTOPKController iNTOPKController)
         {
             this.intopkController = iNTOPKController;
@@ -36,13 +37,9 @@ namespace DATN.Controller
                 RTree.RTree<WeightVector> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<WeightVector>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
                 //not created before
                 tree.locker = new System.Threading.ReaderWriterLock();
-                if (tree.Count == 0)
+                if (tree.Count == 0 || (tree.Count>0 && tree.Count!=listItem.Count))
                 {
-                    //query database
-                    WeightVectorEntities entities = new WeightVectorEntities();
-                    var query = from p in entities.WeightVectors
-                                select p;
-                    List<WeightVector> listItem = query.ToList();
+
                     tree = new RTree.RTree<WeightVector>(listItem.Count>9? 9:listItem.Count/2, 2);
                     int count = 0;
                     foreach (WeightVector p in listItem)
@@ -183,13 +180,16 @@ namespace DATN.Controller
             heapW.Enqueue(mbr);
             int i,count=0;
 
-            var watch = System.Diagnostics.Stopwatch.StartNew();
             while (heapW.Count > 0)
             {
                 MBRModel<WeightVector> e = heapW.Dequeue();
-                //TODO wating for Q to implement INTOPK, right now will create random result
+
                 i = intopkController.IntopK(entries,e, data,rank);
+                if (isDataPoint(e))
+                {
+                    
                 count++;
+                }
                 if (i == 0)
                 {
                     
