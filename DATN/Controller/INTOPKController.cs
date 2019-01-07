@@ -13,7 +13,9 @@ namespace DATN.Controller
     {
         RTree.RTree<DataPoint> tree;
         public List<DataPoint> listItem = new List<DataPoint>();
-        TreeHelper treeHelper;
+    
+        int currentHeight = 0;
+        //TreeHelper treeHelper;
         String fileName="DataPoint.data";
         public void getTree()
         {
@@ -43,7 +45,7 @@ namespace DATN.Controller
                 }
 
                 this.tree = tree;
-                treeHelper = new TreeHelper(tree);
+                //treeHelper = new TreeHelper(tree);
             }
         }
         public MBRModel<DataPoint> getRoot()
@@ -54,75 +56,69 @@ namespace DATN.Controller
             DataPoint upperRight = new DataPoint(bounds.get(0).GetValueOrDefault().max, bounds.get(1).GetValueOrDefault().max);
             DataPoint lowerLeft = new DataPoint(bounds.get(0).GetValueOrDefault().min, bounds.get(1).GetValueOrDefault().min);
             //retrun root
-            return new MBRModel<DataPoint>(lowerLeft, upperRight,tree.getNode(tree.getRootNodeId()));
+            return new MBRModel<DataPoint>(lowerLeft, upperRight);
         }
-        public List<MBRModel<DataPoint>> getChildBoundsAndPoints(MBRModel<DataPoint> entries)
+        public bool contains(MBRModel<DataPoint> e, Rectangle MBR)
+        {
+            return e.lowerLeft.star >= MBR.get(1).GetValueOrDefault().min && e.upperRight.star <= MBR.get(1).GetValueOrDefault().max && e.lowerLeft.rating >= MBR.get(0).GetValueOrDefault().min && e.upperRight.rating <= MBR.get(0).GetValueOrDefault().max;
+        }
+        public List<MBRModel<DataPoint>> getChildBoundsAndPoints(MBRModel<DataPoint> e)
         {
             HashSet<MBRModel<DataPoint>> result = new HashSet<MBRModel<DataPoint>>();
-            MBRModel<DataPoint> element = new MBRModel<DataPoint>();
-            Dictionary<int, Node<DataPoint>> node;
-            Dictionary<int, Node<DataPoint>> treeNode= tree.nodeMap;
+
+            Node<DataPoint> node;
+            Dictionary<int, Node<DataPoint>> treeNode = tree.nodeMap;
+            //List<WeightVector> node = tree.Contains(new Rectangle(e.lowerLeft.rating, e.lowerLeft.star, e.upperRight.rating, e.upperRight.star,0,0));
+            List<DataPoint> list = tree.Contains(tree.getBounds());
             //entries is root
-            if (tree.getBounds().Equals(new Rectangle((float)entries.lowerLeft.rating, (float)entries.lowerLeft.star, (float)entries.upperRight.rating, (float)entries.upperRight.star, 0, 0))){
-                node = treeNode;
+            if (tree.getBounds().Equals(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0)))
+            {
+                node = tree.getNode(tree.getRootNodeId());
+                currentHeight = tree.treeHeight;
             }
             //not root
             else
             {
-                if (!isDataPoint(entries))
+
+                if (!isDataPoint(e))
                 {
-                    node = new Dictionary<int, Node<DataPoint>>();
+                    node = null;
+                    //node = new Dictionary<int, Node<WeightVector>>();
                     foreach (var nodeItem in treeNode)
                     {
-                        if (nodeItem.Value.mbr.Equals(new Rectangle((float)entries.lowerLeft.rating, (float)entries.lowerLeft.star, (float)entries.upperRight.rating, (float)entries.upperRight.star, 0, 0)))
+                        //same height
+                        if (nodeItem.Value.level == e.height - 1)
                         {
-                            node.Add(0,nodeItem.Value);
-                            break;
-                        }
-                }
-                }
-                else
-                {
-                    result.Add(entries);
-                    return result.ToList();
-                }    
-            }
-            
-            foreach(var item in node)
-            {
-                //add MBR
-                if (!item.Value.mbr.Equals(new Rectangle((float)entries.lowerLeft.rating, (float)entries.lowerLeft.star, (float)entries.upperRight.rating, (float)entries.upperRight.star,0,0))) {
-                result.Add(getPoint(item.Value.mbr, true,item.Value));
-                }
-            }
-            if (result.Count == 0)
-            {
-                foreach (var item in node)
-                {
-
-                    //add dataPoint
-                    foreach (var child in item.Value.entries)
-                    {
-                        if (child != null)
-                        {
-                            element = getPoint(child, false,null);
-                            if (element != null)
+                            if (contains(e, nodeItem.Value.mbr))
                             {
-                                result.Add(element);
+                                node = nodeItem.Value;
+                                break;
                             }
 
                         }
-
                     }
-
+                }
+                else
+                {
+                    result.Add(e);
+                    return result.ToList();
                 }
             }
-            
+
+            foreach (var item in node.entries)
+            {
+                if (item != null)
+                {
+                    DataPoint upperRight = new DataPoint(item.get(0).GetValueOrDefault().max, item.get(1).GetValueOrDefault().max);
+                    DataPoint lowerLeft = new DataPoint(item.get(0).GetValueOrDefault().min, item.get(1).GetValueOrDefault().min);
+                    result.Add(new MBRModel<DataPoint>(lowerLeft, upperRight, node.level));
+                }
+            }
             return result.ToList();
         }
-        public MBRModel<DataPoint> getPoint(Rectangle rectangle,bool isRetangle,Node<DataPoint> node)
+        public MBRModel<DataPoint> getPoint(Rectangle rectangle,bool isRetangle)
         {   
-            MBRModel< DataPoint > result= new MBRModel<DataPoint>(new DataPoint(rectangle.min[0], rectangle.min[1]), new DataPoint(rectangle.max[0], rectangle.max[1]),node);
+            MBRModel< DataPoint > result= new MBRModel<DataPoint>(new DataPoint(rectangle.min[0], rectangle.min[1]), new DataPoint(rectangle.max[0], rectangle.max[1]));
             if (!isRetangle)
             {
                 if (isDataPoint(result))

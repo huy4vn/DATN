@@ -53,7 +53,8 @@ namespace DATN.Controller
         {
             List<WeightVector> listResult = new List<WeightVector>();
 
-            List<WeightVector> listWTemp = listW;
+            List<WeightVector> listWTemp = new List<WeightVector>();
+            listWTemp.AddRange(listW);
             WeightVector similarW = new WeightVector(0.5, 0.5);
             int totalW = listWTemp.Count;
             while (listResult.Count< totalW)

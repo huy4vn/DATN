@@ -86,6 +86,7 @@ namespace RTree
         // initialisation
         public int treeHeight = 1; // leaves are always level 1
         public int rootNodeId = 0;
+        public int currentNode = 0;
         public int msize = 0;
 
         // Enables creation of new nodes
@@ -554,6 +555,15 @@ namespace RTree
         {
             return rootNodeId;
         }
+        /// <summary>
+        /// Get the root Node&lt;T&gt; ID
+        /// </summary>
+        /// <returns></returns>
+        public int getNextNode()
+        {
+            currentNode += 1;
+            return currentNode;
+        }
 
         /// <summary>
         /// Split a node. Algorithm is taken pretty much verbatim from
@@ -713,7 +723,7 @@ namespace RTree
             if (highestLowIndex == -1)
             {
                 newNode.addEntry(newRect, newId);
-                return;
+                //return;
             }
             else
             {
@@ -736,12 +746,9 @@ namespace RTree
             //}
             entryStatus[lowestHighIndex] = ENTRY_STATUS_ASSIGNED;
             n.entryCount = n.entries.Length;
-            n.recalculateMBR(n.entries[highestLowIndex]);
+            n.recalculateMBR(n.entries[lowestHighIndex]);
         }
-
-
-
-
+        
         /// <summary>
         /// Pick the next entry to be assigned to a group during a Node&lt;T&gt; split.
         /// [Determine cost of putting each entry in each group] For each 

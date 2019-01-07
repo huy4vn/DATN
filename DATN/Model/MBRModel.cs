@@ -18,17 +18,17 @@ namespace DATN.Model
             this.lowerLeft = lowerLeft;
             this.upperRight = upperRight;
         }
-        public MBRModel(T lowerLeft, T upperRight,Node<T> node)
+        public MBRModel(T lowerLeft, T upperRight,int height)
         {
             this.lowerLeft = lowerLeft;
             this.upperRight = upperRight;
-            if (node != null)
+            if (height!=-1)
             {
             
-                this.node = node;
+                this.height = height;
             }
         }
-        public Node<T> node { get; set; }
+        public int height { get; set; }
         public T lowerLeft { get; set; }
         public T upperRight { get; set; }
     }

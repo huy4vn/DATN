@@ -20,6 +20,7 @@ namespace DATN
         RTAController rtaController = new RTAController();
         List<DataPoint> listS;
         List<WeightVector> listW;
+        List<WeightVector> sortedList;
         public Form1()
         {
             InitializeComponent();
@@ -36,6 +37,7 @@ namespace DATN
             DATNEntities entities2 = new DATNEntities();
             listS=GetS(entities2);
             listW = GetW(entities);
+            sortedList = rtaController.SortList(listW); 
             entities.Dispose();
             entities2.Dispose();
             controller.listItem = listW;
@@ -69,7 +71,7 @@ namespace DATN
                 var elapsedMs = watch.ElapsedMilliseconds;
                 chart1.Series[0].Points.AddY(elapsedMs);
                 chart2.Series[0].Points.AddY(result.Key);
-                MessageBox.Show("Done");
+                MessageBox.Show("Done - Total Result:"+result.Value.Count);
 
             }
             catch (Exception err)
@@ -92,17 +94,17 @@ namespace DATN
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            List<WeightVector>newList=rtaController.SortList(listW);
+            
             var watch = System.Diagnostics.Stopwatch.StartNew();
             DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
            
-            KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS,newList,point, Int32.Parse(this.rank.Text));
+            KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS, sortedList, point, Int32.Parse(this.rank.Text));
             watch.Stop();
             fillTable(result.Value);
             var elapsedMs = watch.ElapsedMilliseconds;
             chart1.Series[1].Points.AddY(elapsedMs);
             chart2.Series[1].Points.AddY(result.Key);
-            MessageBox.Show("Done");
+            MessageBox.Show("Done - Total Result:" + result.Value.Count);
         }
     }
 }

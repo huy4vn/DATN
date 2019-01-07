@@ -15,6 +15,7 @@ namespace DATN.Controller
 
         INTOPKController intopkController;
         public List<WeightVector> listItem = new List<WeightVector>();
+        int currentHeight = 0;
         public void setIntopController(INTOPKController iNTOPKController)
         {
             this.intopkController = iNTOPKController;
@@ -24,6 +25,10 @@ namespace DATN.Controller
         public bool contains(WeightVector e, MBRModel<WeightVector> MBR)
         {
             return e.star >= MBR.lowerLeft.star && e.star <= MBR.upperRight.star && e.rating >= MBR.lowerLeft.rating && e.rating <= MBR.upperRight.rating;
+        }
+        public bool contains(MBRModel<WeightVector> e, Rectangle MBR)
+        {
+            return e.lowerLeft.star >= MBR.get(1).GetValueOrDefault().min && e.upperRight.star <= MBR.get(1).GetValueOrDefault().max && e.lowerLeft.rating >= MBR.get(0).GetValueOrDefault().min && e.upperRight.rating <= MBR.get(0).GetValueOrDefault().max;
         }
         public bool contains(MBRModel<WeightVector> e, MBRModel<WeightVector> MBR)
         {
@@ -82,29 +87,35 @@ namespace DATN.Controller
         public List<MBRModel<WeightVector>> getChildBoundsAndPoints(MBRModel<WeightVector> e)
         {
             HashSet<MBRModel<WeightVector>> result = new HashSet<MBRModel<WeightVector>>();
-            MBRModel<WeightVector> element = new MBRModel<WeightVector>();
       
-            Dictionary<int, Node<WeightVector>> node;
+            Node<WeightVector> node;
             Dictionary<int, Node<WeightVector>> treeNode= tree.nodeMap;
             //List<WeightVector> node = tree.Contains(new Rectangle(e.lowerLeft.rating, e.lowerLeft.star, e.upperRight.rating, e.upperRight.star,0,0));
-
+            List<WeightVector> list = tree.Contains(tree.getBounds());
             //entries is root
             if (tree.getBounds().Equals(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0)))
             {
-                node = treeNode;
+                node = tree.getNode(tree.getRootNodeId());
+                currentHeight = tree.treeHeight;
             }
             //not root
             else
             {
+
                 if (!isDataPoint(e))
-                {
-                    node = new Dictionary<int, Node<WeightVector>>();
+                {   
+                    node = null;
+                    //node = new Dictionary<int, Node<WeightVector>>();
                     foreach (var nodeItem in treeNode)
                     {
-                        if (nodeItem.Value.mbr.Equals(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0)))
+                        //same height
+                        if (nodeItem.Value.level == e.height-1 )
                         {
-                            node.Add(0, nodeItem.Value);
-                            break;
+                            if(contains(e, nodeItem.Value.mbr)) {
+                                node = nodeItem.Value;
+                                break;
+                            }
+                            
                         }
                     }
                 }
@@ -115,43 +126,23 @@ namespace DATN.Controller
                 }
             }
 
-            foreach (var item in node)
+            foreach (var item in node.entries)
             {
-                //add MBR
-                if (!item.Value.mbr.Equals(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0)))
-                {
-                    result.Add(getPoint(item.Value.mbr, true, item.Value));
-                }
+                WeightVector upperRight = new WeightVector(item.get(0).GetValueOrDefault().max, item.get(1).GetValueOrDefault().max);
+                WeightVector lowerLeft = new WeightVector(item.get(0).GetValueOrDefault().min, item.get(1).GetValueOrDefault().min);
+                result.Add(new MBRModel<WeightVector>(lowerLeft, upperRight,node.level));
             }
-            if (result.Count == 0)
-            {
-                foreach (var item in node)
-                {
-
-                    //add dataPoint
-                    foreach (var child in item.Value.entries)
-                    {
-                        if (child != null)
-                        {
-                            element = getPoint(child, false, null);
-                            if (element != null)
-                            {
-                                result.Add(element);
-                            }
-
-                        }
-
-                    }
-
-                }
-            }
-
             return result.ToList();
         }
 
-        public MBRModel<WeightVector> getPoint(Rectangle rectangle, bool isRetangle, Node<WeightVector> node)
+        private bool isDataPoint(Rectangle mbr)
         {
-            MBRModel<WeightVector> result = new MBRModel<WeightVector>(new WeightVector(rectangle.min[0], rectangle.min[1]), new WeightVector(rectangle.max[0], rectangle.max[1]), node);
+            return mbr.max[0] == mbr.min[0] && mbr.max[1] == mbr.min[1] && mbr.max[2] == mbr.min[2];
+        }
+
+        public MBRModel<WeightVector> getPoint(Rectangle rectangle, bool isRetangle)
+        {
+            MBRModel<WeightVector> result = new MBRModel<WeightVector>(new WeightVector(rectangle.min[0], rectangle.min[1]), new WeightVector(rectangle.max[0], rectangle.max[1]));
             if (!isRetangle)
             {
                 if (isDataPoint(result))
