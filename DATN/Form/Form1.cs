@@ -92,10 +92,11 @@ namespace DATN
         }
         private void button2_Click(object sender, EventArgs e)
         {
+            List<WeightVector>newList=rtaController.SortList(listW);
             var watch = System.Diagnostics.Stopwatch.StartNew();
             DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
            
-            KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS,listW,point, Int32.Parse(this.rank.Text));
+            KeyValuePair<int,HashSet<WeightVector>> result =rtaController.RTA(listS,newList,point, Int32.Parse(this.rank.Text));
             watch.Stop();
             fillTable(result.Value);
             var elapsedMs = watch.ElapsedMilliseconds;

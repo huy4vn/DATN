@@ -48,5 +48,39 @@ namespace DATN.Controller
             }
             return new KeyValuePair<int, HashSet<WeightVector>>(totalAccessWeightVector,w2);
         }
+
+        internal List<WeightVector> SortList(List<WeightVector> listW)
+        {
+            List<WeightVector> listResult = new List<WeightVector>();
+
+            List<WeightVector> listWTemp = listW;
+            WeightVector similarW = new WeightVector(0.5, 0.5);
+            int totalW = listWTemp.Count;
+            while (listResult.Count< totalW)
+            {
+                double max = Int32.MinValue;
+                int index = -1;
+                for (var i= 0;i < listWTemp.Count;i++)
+                {
+                    WeightVector itemW = listWTemp[i];
+                    double similarValue = GetCosineSimilarity(itemW, similarW);
+                    if (similarValue > max)
+                    {
+                        index = i;
+                        max = similarValue;
+                    }
+                }
+                similarW = listWTemp[index];
+                listResult.Add(similarW);
+                listWTemp.RemoveAt(index);
+            }
+            return listResult;
+
+        }
+        public static double GetCosineSimilarity(WeightVector V1, WeightVector V2)
+        {
+            return (V1.rating.Value * V2.rating.Value + V1.star.Value * V2.star.Value) / (Math.Sqrt(Math.Pow(V1.rating.Value, 2) + Math.Pow(V1.star.Value, 2))*
+                       Math.Sqrt(Math.Pow(V2.rating.Value, 2) + Math.Pow(V2.star.Value, 2)));
+        }
     }
 }

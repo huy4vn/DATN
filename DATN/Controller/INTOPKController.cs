@@ -17,14 +17,18 @@ namespace DATN.Controller
         String fileName="DataPoint.data";
         public void getTree()
         {
+            
             System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\"));
+            //not get tree before
             if (tree == null)
             {
+                //get from directory
                 RTree.RTree<DataPoint> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<DataPoint>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
-                //not created before
+                //tree not created before
                 tree.locker = new System.Threading.ReaderWriterLock();
                 if (tree.Count == 0 || (tree.Count > 0 && tree.Count != listItem.Count))
                 {
+                    //create tree
                     tree = new RTree.RTree<DataPoint>(listItem.Count / 2, 2);
                     int count = 0;
                     foreach (DataPoint p in listItem)
@@ -34,6 +38,7 @@ namespace DATN.Controller
                         RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
                         tree.Add(rect, p);
                     }
+                    //save tree to file
                     SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
                 }
 
