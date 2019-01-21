@@ -10,30 +10,35 @@ using System.Windows.Forms;
 
 namespace DATN.Controller
 {
-    class BBRController
+    class BBRController : BasicFunction
     {
 
         INTOPKController intopkController;
         public List<WeightVector> listItem = new List<WeightVector>();
         int currentHeight = 0;
+
         public void setIntopController(INTOPKController iNTOPKController)
         {
             this.intopkController = iNTOPKController;
         }
+
         RTree.RTree<WeightVector> tree;
         String fileName = "WeightVector.data";
         public bool contains(WeightVector e, MBRModel<WeightVector> MBR)
         {
             return e.star >= MBR.lowerLeft.star && e.star <= MBR.upperRight.star && e.rating >= MBR.lowerLeft.rating && e.rating <= MBR.upperRight.rating;
         }
+
         public bool contains(MBRModel<WeightVector> e, Rectangle MBR)
         {
             return e.lowerLeft.star >= MBR.get(1).GetValueOrDefault().min && e.upperRight.star <= MBR.get(1).GetValueOrDefault().max && e.lowerLeft.rating >= MBR.get(0).GetValueOrDefault().min && e.upperRight.rating <= MBR.get(0).GetValueOrDefault().max;
         }
+
         public bool contains(MBRModel<WeightVector> e, MBRModel<WeightVector> MBR)
         {
             return e.lowerLeft.star >= MBR.lowerLeft.star && e.upperRight.star <= MBR.upperRight.star && e.lowerLeft.rating >= MBR.lowerLeft.rating && e.upperRight.rating <= MBR.upperRight.rating;
         }
+
         public void getTree()
         {
             System.IO.Directory.CreateDirectory(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\"));
@@ -61,7 +66,8 @@ namespace DATN.Controller
 
             }
         }
-            public MBRModel<WeightVector> getRoot()
+
+        public MBRModel<WeightVector> getRoot()
         {
             //getTree();
             //get root after add to tree 
@@ -71,6 +77,7 @@ namespace DATN.Controller
             //retrun root
             return new MBRModel<WeightVector>(lowerLeft, upperRight);
         }
+
         private HashSet<MBRModel<WeightVector>> expand(MBRModel<WeightVector> e)
         {
             HashSet<MBRModel<WeightVector>> result = new HashSet<MBRModel<WeightVector>>();
@@ -80,10 +87,12 @@ namespace DATN.Controller
             }
             return result;
         }
+
         private List<WeightVector> expandAll(MBRModel<WeightVector> e)
         {
             return tree.Contains(new Rectangle((float)e.lowerLeft.rating, (float)e.lowerLeft.star, (float)e.upperRight.rating, (float)e.upperRight.star, 0, 0));
         }
+
         public List<MBRModel<WeightVector>> getChildBoundsAndPoints(MBRModel<WeightVector> e)
         {
             HashSet<MBRModel<WeightVector>> result = new HashSet<MBRModel<WeightVector>>();
@@ -128,16 +137,15 @@ namespace DATN.Controller
 
             foreach (var item in node.entries)
             {
-                WeightVector upperRight = new WeightVector(item.get(0).GetValueOrDefault().max, item.get(1).GetValueOrDefault().max);
-                WeightVector lowerLeft = new WeightVector(item.get(0).GetValueOrDefault().min, item.get(1).GetValueOrDefault().min);
-                result.Add(new MBRModel<WeightVector>(lowerLeft, upperRight,node.level));
+                if (item != null)
+                {
+                    WeightVector upperRight = new WeightVector(item.get(0).GetValueOrDefault().max, item.get(1).GetValueOrDefault().max);
+                    WeightVector lowerLeft = new WeightVector(item.get(0).GetValueOrDefault().min, item.get(1).GetValueOrDefault().min);
+                    result.Add(new MBRModel<WeightVector>(lowerLeft, upperRight, node.level));
+                }
+               
             }
             return result.ToList();
-        }
-
-        private bool isDataPoint(Rectangle mbr)
-        {
-            return mbr.max[0] == mbr.min[0] && mbr.max[1] == mbr.min[1] && mbr.max[2] == mbr.min[2];
         }
 
         public MBRModel<WeightVector> getPoint(Rectangle rectangle, bool isRetangle)
@@ -157,10 +165,7 @@ namespace DATN.Controller
             }
 
         }
-        public bool isDataPoint(MBRModel<WeightVector> point)
-        {
-            return point.lowerLeft.rating == point.upperRight.rating && point.lowerLeft.star == point.upperRight.star;
-        }
+
         public KeyValuePair<int, HashSet<WeightVector>> BBR(DataPoint data,int rank)
         {
 
@@ -176,11 +181,9 @@ namespace DATN.Controller
                 MBRModel<WeightVector> e = heapW.Dequeue();
 
                 i = intopkController.IntopK(entries,e, data,rank);
-                if (isDataPoint(e))
-                {
-                    
+               
                 count++;
-                }
+                
                 if (i == 0)
                 {
                     
@@ -201,9 +204,50 @@ namespace DATN.Controller
 
                     }
                 }
+                if (heapW.Count > 0 )
+                {
+                    List<MBRModel<WeightVector>> listSorted = SortList(heapW.ToList(), data);
+                    heapW = new Queue<MBRModel<WeightVector>>();
+                    foreach (var item in listSorted)
+                    {
+                        heapW.Enqueue(item);
+
+                    }
+                }
             }
 
             return new KeyValuePair<int, HashSet<WeightVector>>(count,result);
         }
+
+        internal List<MBRModel<WeightVector>> SortList(List<MBRModel<WeightVector>> listW,DataPoint p)
+        {
+            List<MBRModel<WeightVector>> listResult = new List<MBRModel<WeightVector>>();
+
+            List<MBRModel<WeightVector>> listWTemp = new List<MBRModel<WeightVector>>();
+            listWTemp.AddRange(listW);
+            MBRModel<WeightVector> similarW = new MBRModel<WeightVector>(new WeightVector(0.5,0.5), new WeightVector(0.5, 0.5));
+            int totalW = listWTemp.Count;
+            while (listResult.Count < totalW)
+            {
+                double max = Int32.MinValue;
+                int index = -1;
+                for (var i = 0; i < listWTemp.Count; i++)
+                {
+                    MBRModel<WeightVector> itemW = listWTemp[i];
+                    double similarValue = GetCosineSimilarity(itemW, similarW,p);
+                    if (similarValue > max)
+                    {
+                        index = i;
+                        max = similarValue;
+                    }
+                }
+                similarW = listWTemp[index];
+                listResult.Add(similarW);
+                listWTemp.RemoveAt(index);
+            }
+            return listResult;
+
+        }
+        
     }
 }

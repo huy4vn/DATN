@@ -65,6 +65,7 @@ namespace DATN
             {
                 var watch = System.Diagnostics.Stopwatch.StartNew();
                 DataPoint point = new DataPoint(Double.Parse(this.rating.Text), Double.Parse(this.star.Text));
+                
                 KeyValuePair<int, HashSet<WeightVector>> result =controller.BBR(point,Int32.Parse(this.rank.Text));
                 watch.Stop();
                 fillTable(result.Value);

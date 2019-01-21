@@ -9,15 +9,10 @@ namespace DATN.Controller
 {
     class TopKController
     {
-        public static double f(DataPoint q, WeightVector w)
-        {
-            return q.star.Value * w.star.Value + q.rating.Value * w.rating.Value;
-        }
-
         public static List<DataPoint> TopK(WeightVector w,List<DataPoint> points,int rank)
         {
             List<DataPoint> buffer = points;
-            buffer.Sort((x, y) => f(x, w).CompareTo(f(y, w)));
+            buffer.Sort((x, y) => BasicFunction.f(x, w).CompareTo(BasicFunction.f(y, w)));
             return buffer.GetRange(0,rank);
         }
     }

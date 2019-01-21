@@ -7,12 +7,9 @@ using System.Threading.Tasks;
 
 namespace DATN.Controller
 {
-    class RTAController
+    class RTAController : BasicFunction
     {
-        public double f(DataPoint q,WeightVector w)
-        {
-            return q.star.Value * w.star.Value + q.rating.Value * w.rating.Value;
-        }
+        
         public double max(List<DataPoint> list,WeightVector w)
         {
 
@@ -78,10 +75,6 @@ namespace DATN.Controller
             return listResult;
 
         }
-        public static double GetCosineSimilarity(WeightVector V1, WeightVector V2)
-        {
-            return (V1.rating.Value * V2.rating.Value + V1.star.Value * V2.star.Value) / (Math.Sqrt(Math.Pow(V1.rating.Value, 2) + Math.Pow(V1.star.Value, 2))*
-                       Math.Sqrt(Math.Pow(V2.rating.Value, 2) + Math.Pow(V2.star.Value, 2)));
-        }
+        
     }
 }

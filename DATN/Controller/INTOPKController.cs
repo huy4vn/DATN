@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace DATN.Controller
 {
-    class INTOPKController
+    class INTOPKController: BasicFunction
     {
         RTree.RTree<DataPoint> tree;
         public List<DataPoint> listItem = new List<DataPoint>();
@@ -28,6 +28,7 @@ namespace DATN.Controller
                 RTree.RTree<DataPoint> tree = SaveDataController.ReadFromBinaryFile<RTree.RTree<DataPoint>>(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName));
                 //tree not created before
                 tree.locker = new System.Threading.ReaderWriterLock();
+                var watch = System.Diagnostics.Stopwatch.StartNew();
                 if (tree.Count == 0 || (tree.Count > 0 && tree.Count != listItem.Count))
                 {
                     //create tree
@@ -40,6 +41,8 @@ namespace DATN.Controller
                         RTree.Rectangle rect = new RTree.Rectangle((float)p.rating, (float)p.star, (float)p.rating, (float)p.star, 0, 0);
                         tree.Add(rect, p);
                     }
+                    watch.Stop();
+                    Debug.WriteLine("INTOP - process Tree Time:" + watch.ElapsedMilliseconds);
                     //save tree to file
                     SaveDataController.WriteToBinaryFile(System.IO.Path.Combine(Environment.CurrentDirectory, @"Data\", fileName), tree);
                 }
@@ -198,7 +201,7 @@ namespace DATN.Controller
                         }
                     }
                 }
-               
+                HeapS = new Queue<MBRModel<DataPoint>>(HeapS.OrderBy(s => lv(mv, s.lowerLeft)));
             }
             
             if (precincPoints >= k)
@@ -211,29 +214,12 @@ namespace DATN.Controller
                 return 1;
             }
         }
-        public bool isDataPoint(MBRModel<DataPoint> point)
-        {
-            return point.lowerLeft.rating == point.upperRight.rating && point.lowerLeft.star == point.upperRight.star;
-        }
-        public bool isDataPoint(MBRModel<WeightVector> point)
-        {
-            return point.lowerLeft.rating == point.upperRight.rating && point.lowerLeft.star == point.upperRight.star;
-        }
         private List<MBRModel<DataPoint>> expand(MBRModel<DataPoint> entries)
         {
             List<MBRModel<DataPoint>> result = new List<MBRModel<DataPoint>>();
            
             result.AddRange(getChildBoundsAndPoints(entries));
             return result;
-        }
-
-        public static double uv(MBRModel<WeightVector> mv, DataPoint p)
-        {
-            return (double)(mv.upperRight.rating * p.rating) + (double)(mv.upperRight.star * p.star);
-        }
-        public static double lv(MBRModel<WeightVector> mv, DataPoint p)
-        {
-            return (double)(mv.lowerLeft.rating * p.rating) + (double)(mv.lowerLeft.star * p.star);
-        }
+        }  
     }
 }
